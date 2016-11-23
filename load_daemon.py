@@ -1,30 +1,45 @@
-#!/usr/bin/env python3
+#!/usr/bin/python3
+
+#ps -eo comm,ppid,pid,sid,tty,state|grep "load_daemon*"
 
 import logging
 import signal
+import errno
+from time import sleep
 from os import (
-    fork, _exit, umask, chdir, sysconf_names, sysconf, close, EX_OK, EX_OSERR
+    fork, _exit, umask, chdir, sysconf_names, setsid, sysconf, open, close, write,
+    EX_OK, lockf, EX_OSERR,O_RDWR, O_CREAT, F_TLOCK,
 )
 
 
-def demonize():
-    try:
-        p = fork()
-    except OSError:
-        _exit(EX_OSERR)
-    else:
+def daemonize():
+
+    pid = fork()
+    if pid > 0:
+        _exit(EX_OK)
+    # TODO: Obsluga sygnalow!
+    setsid()
+    pid2 = fork()
+    if pid2 > 0:
         _exit(EX_OK)
 
     umask(0)
-    chdir('/')
-    fdv = sysconf(sysconf_names['SC_OPEN_MAX'])
-    closestats = [close(fd) for fd in range(fdv, 0, -1)]
-    if -1 in closestats:
-        raise OSError('Unsuccessful detaching from control terminal. Demonization aborted.')
+    chdir('/var/lock')
+    for f in range(2, -1, -1):
+            close(f)
+    # FIXME:tworzenie lockfile'a = tylko jedna instancja daemona :)
+    #lockfile = open('load_daemon.lock', O_RDWR | O_CREAT, 0o720)
+    #if lockf(lockfile, F_TLOCK, 0) < 0:
+    #    exit(EX_OK)
+    #else:
+    #    write(pid2, str(pid2))
 
 
 def main():
-    pass
+    daemonize()
+    while True:
+        sleep(200)
+
 
 if __name__ == '__main__':
     main()
