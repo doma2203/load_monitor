@@ -1,0 +1,136 @@
+<CurrStateSmall@Label>:
+    size_hint:None,None
+    height:"30px"
+    width:"150px"
+    markup:True
+    font_size:"12pt"
+
+<StateTitle@Label>:
+    size_hint_x:None,None
+    width:"150px"
+    markup:True
+
+<StateDisplay@TextInput>
+    size_hint:None,None
+    readonly:True
+    width:"150px"
+    height:"110px"
+    background_color:[255,255,255,0.7]
+    font_name:"digital-7"
+    font_size:"90pt"
+
+<BelowThreshold@ProgressBar>
+    size_hint:None,None
+    bar_color:[0,255,0,0.6]
+    height:"20px"
+    width:"150px"
+    max:30
+
+<MainScreen>:
+    rows:2
+    cols:1
+    spacing:[10,10]
+    StateScreen:
+        rows:1
+        cols:4
+        size_hint_y:None
+        size_hint_x:1
+        col_default_width:self.parent.width/3
+        col_force_default:True
+        height:"170px"
+        padding:[60,10,0,0]
+        GridLayout:
+            rows:4
+            padding:[0,10,0,0]
+            CurrStateSmall:
+                text:"[b]Status[/b]"
+            StateDisplay:
+                padding:[55,5,0,0]
+                -height:"45px"
+                text:"OK"
+                font_name:"digital-7"
+                -font_size:"30pt"
+            CurrStateSmall:
+                text:"[b]Uptime[/b]"
+            StateDisplay:
+                padding:[15,5,0,0]
+                -height:"45px"
+                text:"12:45:32"
+                -font_size:"32pt"
+        GridLayout:
+            rows:3
+            padding:[0,10,0,0]
+            CurrStateSmall:
+                -height:"30px"
+                text:"[b]CPU[/b]"
+            StateDisplay:
+                text:"100"
+            BelowThreshold:
+                value:10
+        GridLayout:
+            rows:3
+            padding:[0,10,0,0]
+            CurrStateSmall:
+                -height:"30px"
+                text:"[b]GPU[/b]"
+            StateDisplay:
+                text:"100"
+            BelowThreshold:
+                value:20
+
+    TabbedPanel:
+        tab_height:"30px"
+        font_size:"12px"
+        tab_pos:"top_left"
+        do_default_tab:False
+        size_hint:1,1
+        TabbedPanelItem:
+            text:"Statystyki"
+            id:tab1
+            StatsScreen:
+                rows:2
+                cols:1
+                size_hint_x:1
+                Label:
+                    size_hint_y:None
+                    height:"50px"
+                    markup:True
+                    text:"[b]Ostatnie zdarzenia[/b]:"
+                    font_size:"18pt"
+                Accordion:
+                    content_size:"200px"
+                    orientation:"horizontal"
+                    AccordionItem:
+                        title:"11.05.2016"
+                        Label:
+                            size_hint_x:1
+                            text:"Lorem ipsum dolor sit amet, consectetur adipiscing elit,\nsed do eiusmod tempor incididunt utabore et dolore magna aliqua.\n"
+                    AccordionItem:
+                        title:"10.05.2016"
+                        text:"aaa"
+                    AccordionItem:
+                        title:"09.05.2016"
+                        text:"aaa"
+                    AccordionItem:
+                        title:"08.05.2016"
+                        text:"aaa"
+        TabbedPanelItem:
+            text:"Ustawienia"
+            id:tab2
+            SettingsScreen:
+                cols:2
+                rows:3
+                padding:[0,40,0,0]
+                size_hint_y:.4
+                Label:
+                    text:"Plik z logami:"
+                    height:"50px"
+                Button:
+                    height:"50px"
+                    text:"Otwórz log"
+                Label:
+                    height:"100px"
+                    text:"Kompresuj logi większe niż 2 MB"
+                Switch:
+                Label:
+                    text:"Temperatura alarmowa:"

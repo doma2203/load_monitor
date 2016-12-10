@@ -1,14 +1,42 @@
-import logging
+#!/usr/bin/env python3
+import kivy
+kivy.require('1.9.1')
+from kivy.app import App
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.gridlayout import GridLayout
+from kivy.uix.accordion import Accordion
+from kivy.core.text import LabelBase
+from kivy.uix.tabbedpanel import TabbedPanel
 
-#MRHP - Most Resource-Hungry Processes
+LabelBase.register('digital-7', 'fonts/digital-7.ttf')
 
-def main():
-    logging.basicConfig(format="%(levelname)s|%(asctime)s|%(message)s", datefmt="%d/%m/%Y %H:%M:%S",filename="log/first.log",level=logging.DEBUG)
-    logging.warning("Your computer is overheating!")
-    logging.info("Temp:72C")
-    logging.debug("Total|CPU:85%;RAM:100%;SWAP:5.5GB/7.85GB;NOTE:Lorem ipsum dolor sit amet")
-    logging.debug("MRHP|PIDs:2420,1313,2424,2425,242;CPU:21%,22%,34%,10%,2%;RAM:45%,10%,15%,10%,20%")
+class CurrentStateScreen(BoxLayout):
+    pass
+
+
+class CurrentStateDescription(BoxLayout):
+    pass
+
+
+class StateScreen(GridLayout):
+    pass
+
+
+class MainScreen(GridLayout):
+    pass
+
+
+class StatsScreen(GridLayout):
+    pass
+
+class SettingsScreen(GridLayout):
+    pass
+
+class MyApp(App):
+    def build(self):
+        self.title = "Load monitor v. 0.0.2 (przynajmniej wyglada)"
+        return MainScreen()
 
 
 if __name__ == '__main__':
-    main()
+    MyApp().run()
