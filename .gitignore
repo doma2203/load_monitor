@@ -6,4 +6,5 @@ log/
 .idea/workspace.xml
 .idea/vcs.xml
 .idea/
-/garden/garden.recycleview/
+.ipynb_checkpoints
+libs/

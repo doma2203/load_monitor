@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 import kivy
 kivy.require('1.9.1')
 from kivy.app import App
@@ -7,8 +7,13 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.accordion import Accordion
 from kivy.core.text import LabelBase
 from kivy.uix.tabbedpanel import TabbedPanel
+from kivy.properties import ObjectProperty
 
 LabelBase.register('digital-7', 'fonts/digital-7.ttf')
+
+
+def func():
+    return "Hello!"
 
 class CurrentStateScreen(BoxLayout):
     pass
@@ -19,7 +24,7 @@ class CurrentStateDescription(BoxLayout):
 
 
 class StateScreen(GridLayout):
-    pass
+    uptime = ObjectProperty(None)
 
 
 class MainScreen(GridLayout):
@@ -28,6 +33,8 @@ class MainScreen(GridLayout):
 
 class StatsScreen(GridLayout):
     pass
+
+
 
 class SettingsScreen(GridLayout):
     pass
