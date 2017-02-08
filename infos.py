@@ -14,7 +14,6 @@ class MonitorPoint(object):
         self._value = self.check()
         self._label = self.checklabel()
 
-
     @property
     def label(self):
         return self._label
@@ -35,14 +34,11 @@ class MonitorPoint(object):
         '''Zakladam, ze w najprostszym przypadku etykietki brak '''
         return self.value
 
-
     def check(self):
         raise NotImplementedError
 
     def checklabel(self):
         return None
-
-#Temperature(/sys/class/hwmon/hwmon1/temp1(_value|_label))
 
 
 class Temperature(MonitorPoint):
@@ -58,19 +54,23 @@ class Temperature(MonitorPoint):
         return self._path
 
     def check(self):
+        file=open(self.path)
         try:
-            file=open(self.path)
+            return float(file.readline())/1000
         except IOError:
-           return 0
-        return float(file.readline())/1000
+            return 0
 
     def checklabel(self):
-        '''Jakis kreatywny docstring'''
+        '''Jako glowny parametr klasy dostajemy plik z odczytem poniewaz zakladamy, ze takowy bedzie istnial zawsze,
+        czego nie mozna powiedziec np. o etykietkach. Jedyna zmiana, jaka musimy poczynic, zeby plik z odczytem zmienil
+        sie w plik z etykieta (ktorego, obecnosc w systemie plikow weryfikujemy), jest podmiana czesci
+        sciezki za pomoca re.sub-a.'''
         lab=re.sub(r'(input)','label',self.path)
         if os.path.exists(lab):
             file=open(lab)
             return file.readline().strip()
         return re.findall(r'(temp\d)',self.path)[0]
+
 
 class TemperaturePoints:
     def __init__(self,dirpath):
@@ -78,18 +78,36 @@ class TemperaturePoints:
         self._dirpath=dirpath
         self._group=self.checkgroup()
 
+    @property
+    def group(self):
+        return self._group
+
+    @property
+    def items(self):
+        return self._items
+
+    @property
+    def dirpath(self):
+        return self._dirpath
+
+    def __call__(self, *args, **kwargs):
+        return self.group,self.items
+
     def __iter__(self):
-        yield self._dirpath
-        for item in self._items:
+        '''przyklad dzialania iteratora:
+        for i in iglob('/sys/class/hwmon/hwmon?'):
+            for k in TemperaturePoints(i):
+                print k '''
+        yield self.group
+        for item in self.items:
             yield item
 
     def checkgroup(self):
-        name=self._dirpath+'/name'
+        name = self._dirpath+'/name'
         if os.path.exists(name):
-            file=open(name)
+            file = open(name)
             return file.readline().strip()
         return None
-
 
 
 class Uptime(MonitorPoint):
@@ -102,15 +120,4 @@ class Uptime(MonitorPoint):
         return time.strftime('%H:%M:%S', time.localtime(uptimes[0]))
 
 
-y=Uptime()
-print y()
-for x in iglob('/sys/class/hwmon/hwmon1'):
-    a=[Temperature(y)() for y in iglob(x+'/temp?_input')]
-
-print a
-
-
-
-y=(Temperature('/sys/class/hwmon/hwmon0/temp2_input')(),Temperature('/sys/class/hwmon/hwmon1/temp1_input')())
-for i in y:
-    print i
+class CPUFrequency:
