@@ -53,44 +53,45 @@ class Monit(object):
             a = re.findall(r'power_supply/(BAT\d)', path)
             yield a[0]
 
-    # @staticmethod
-    # def temperatures(paths = glob('/sys/class/hwmon/hwmon?')):
-    #     paths.sort()
-    #     for path in paths:
-    #         labels=glob(path + '/temp?_label')
-    #         values=glob(path + '/temp?_input')
-    #         labels.sort()
-    #         labelnum = len(labels)
-    #         valuenum=len(values)
-    #         res=dict()
-    #         lab=list()
-    #         for label,i in zip(labels,range(1,valuenum+1)):
-    #             if bool(labelnum):
-    #                 labelfile = open(label)
-    #                 lab.append(labelfile.readline().strip())
-    #                 labelfile.close()
-    #             else:
-    #                 lab.append('temp'+str(i))
-    #             namefile = open(path + '/name', 'r')
-    #             res[namefile.readline().strip()]=dict.fromkeys(lab)
-    #             namefile.close()
-    #             # file=open(value,'r')
-    #             # try:
-    #             #     val=float(file.readline())/1000
-    #             # except IOError:
-    #             #     val=0
-    #             # file.close()
-    #             # res[name] = dict(lab=val)
-    #             return res
+    @staticmethod
+    def temperatures(paths = glob('/sys/class/hwmon/hwmon?')):
+        paths.sort()
+        for path in paths:
+            labels=glob(path + '/temp?_label')
+            values=glob(path + '/temp?_input')
+            labels.sort()
+            labelnum = len(labels)
+            valuenum=len(values)
+            res=dict()
+            lab=list()
+            for label,i in zip(labels,range(1,valuenum+1)):
+                if labelnum is not 0:
+                    labelfile = open(label)
+                    lab.append(labelfile.readline().strip())
+                    labelfile.close()
+                # else:
+                #     lab.append('temp'+str(i))
+                # namefile = open(path + '/name', 'r')
+                # res[namefile.readline().strip()]=dict.fromkeys(lab)
+                # namefile.close()
+                # # file=open(value,'r')
+                # try:
+                #     val=float(file.readline())/1000
+                # except IOError:
+                #     val=0
+                # file.close()
+                # res[name] = dict(lab=val)
+                # return res
+
     @staticmethod
     def templabels(paths=glob('/sys/class/hwmon/*')):
         paths=sorted(paths)
         for path in paths:
             name=glob(path+'/name')[0]
-            labels=glob(path+'temp?_label')
+            labels=glob(path+'/temp?_label')
             labels=sorted(labels)
             labelnum=len(labels)
-            valuenum=len(glob(path+'temp?_input'))
+            valuenum=len(glob(path+'/temp?_input'))
             lab = list()
             res=dict()
             for label,i in zip(labels,range(1,valuenum+1)):
@@ -151,5 +152,5 @@ print x.cpufreq()
 print x.uptime()
 print x.batteryinfo()
 print x.processinfo()
-print x.labels
+print x.templabels()
 # print x.temperatures()

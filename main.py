@@ -7,7 +7,8 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.accordion import Accordion
 from kivy.core.text import LabelBase
 from kivy.uix.tabbedpanel import TabbedPanel
-from kivy.properties import ObjectProperty
+from kivy.properties import ObjectProperty, StringProperty
+from parser2 import Monit
 
 LabelBase.register('digital-7', 'fonts/digital-7.ttf')
 

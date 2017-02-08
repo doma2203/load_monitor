@@ -138,18 +138,23 @@ def tempinfo():
     return res
 
 
-@loop()
 def processes():
-    """Kolezanka (funkcja) wymaga specjalnego traktowania, gdyz najlepiej czuje sie w obecnosci petli, tudziez dekoratora
+    """Kolezanka (funkcja) wymaga specjalnego traktowania, gdyz najl
+         epiej czuje sie w obecnosci petli, tudziez dekoratora
     z takowa. Bez tego nie zwraca poprawnie 'cpu_percent' (dzialanie przewidziane i zgodne z dokumentacja biblioteki),
     ale sortuje po pozostalych parametrach, wiec te bardziej zasobozerne (co do pamieci) wyswietla nadal poprawnie.\n
     :return:
     :rtype: dict """
-    info = _processinfo()
-    for item in info:
-    # TODO: Wyprowadzic ludzki format listy!!!
-        pass
+    processinfo = list()
+    for process in psutil.process_iter():
+        processinfo.append(process.as_dict(attrs=['pid', 'name', 'memory_percent', 'memory_info', 'cpu_percent']))
+    processinfo = sorted(processinfo, key=lambda k: (k['cpu_percent'], k['memory_percent'],
+                                                     k['memory_info'][0], k['memory_info'][1]), reverse=True)[:5]
+    return [(proc['name'], proc['pid']) for proc in processinfo]
+
 
 '''Testy:'''
 
-print "Uptime:\t{0}\nBateria:{1}\nTaktowania:\n{2}\nTemperatury:\n{3}\n".format(uptime(),battery_status(),cpufreqmonit(),tempinfo())
+print "Uptime:\t{0}\nBateria:{1}\nTaktowania:\n{2}\nTemperatury:\n{3}\n"\
+    .format(uptime(),battery_status(),cpufreqmonit(),tempinfo())
+print processes()
