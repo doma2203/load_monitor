@@ -74,8 +74,8 @@ class Temperature(MonitorPoint):
 
 class TemperaturePoints:
     def __init__(self,dirpath):
-        self._items=[Temperature(path)() for path in glob(dirpath+'/temp?_input')]
-        self._dirpath=dirpath
+        self._dirpath = dirpath
+        self._items=[Temperature(path)() for path in glob(self._dirpath+'/temp?_input')]
         self._group=self.checkgroup()
 
     @property
@@ -120,4 +120,67 @@ class Uptime(MonitorPoint):
         return time.strftime('%H:%M:%S', time.localtime(uptimes[0]))
 
 
-class CPUFrequency:
+class Frequency(MonitorPoint):
+    def __init__(self,path):
+        self._path=path
+        super(Frequency,self).__init__()
+
+    def __call__(self, *args, **kwargs):
+        return self.label, self.value
+
+    @property
+    def path(self):
+        return self._path
+
+    def check(self):
+        file=open(self.path+'cpuinfo_cur_freq')
+        return float(file.readline())/1000  # zamiana na MHz
+
+    def checklabel(self):
+        return re.findall(r'(cpu\d)',self.path)[0]
+
+
+class FrequencyPoints:
+    def __init__(self,dirpath):
+        self._dirpath=dirpath
+        self._cores=[Frequency(path)() for path in glob(self.dirpath)]
+
+     def __call__(self, *args, **kwargs):
+         return self.cores
+
+    def __iter__(self):
+        for core in self.cores:
+            yield core
+
+    @property
+    def cores(self):
+        return self._cores
+
+
+class Processes:
+    def __init__(self,number=5):
+        self._number=number
+        self.pslist=self.processlist()
+
+    def __call__(self, *args, **kwargs):
+        return self.pslist
+
+    def __iter__(self):
+        for process in self.pslist:
+            yield process
+
+    @property
+    def number(self):
+        return self._number
+
+    @property
+    def pslist(self):
+        return self._pslist
+
+    def processlist(self):
+        proclist=list()
+        for ps in psutil.process_iter():
+            proclist.append(ps.as_dict(attrs=['pid', 'name', 'memory_percent', 'memory_info', 'cpu_percent']))
+        proclist=sorted(proclist, key=lambda k: (k['cpu_percent'], k['memory_percent'],
+                                                     k['memory_info'][0], k['memory_info'][1]), reverse=True)[:self.number]
+        return [(proc['name'],proc['pid']) for proc in proclist]
