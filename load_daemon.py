@@ -5,10 +5,12 @@
 import logging
 import signal
 import errno
+import monitor
 
 
 
 def main():
+    print monitor.Batteries()
     pass
 
 if __name__ == '__main__':
