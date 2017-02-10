@@ -1,13 +1,8 @@
 # Readme
-**Load monitor** został napisany jako wprawka w poruszaniu i przetwarzaniu
-plików systemowych, a - przy okazji - jako zaliczenie
-przedmiotu. Jako że jest to mój pierwszy tak rozbudowany program
-i nie mam zbyt dużego doświadczenia w programowaniu w Pythonie,
-bardzo proszę o wyrozumiałość (tak, to do Pana, Panie Doktorze).
+**Load monitor** będzie pozwalał na monitorowanie temperatur i ich zależności od obciążenia systemu i innych parametrów oraz umożliwi szybkie reagowanie na przegrzane (w szczególności to spowodowane intensywnym zużywaniem zasobów przez procesy)
 
-Jeśli widzisz, ze coś nie jest: _as Pythonic as it could be_
-- daj znać. Wszelkie uwagi dotyczące stylu programowania
-i innych kwestii technicznych bardzo mile widziane. :)
+ W chwili obecnej w 100% pewnym i przetestowanym modułem jest 'monitor' - moduł parsujący pliki VFS Linuksa. Na dniach powstanie interfejs graficzny (mały problem z odświeżaniem w Kivy).
+
 
 ## Wykorzystane moduły:
 * **psutil**

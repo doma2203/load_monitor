@@ -3,12 +3,14 @@ import kivy
 kivy.require('1.9.1')
 from kivy.app import App
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.textinput import TextInput
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.accordion import Accordion
 from kivy.core.text import LabelBase
 from kivy.uix.tabbedpanel import TabbedPanel
-from kivy.properties import ObjectProperty, StringProperty
-from parser2 import Monit
+from kivy.properties import ObjectProperty, StringProperty, NumericProperty
+from kivy.clock import Clock
+import monitor
 
 LabelBase.register('digital-7', 'fonts/digital-7.ttf')
 
@@ -25,7 +27,8 @@ class CurrentStateDescription(BoxLayout):
 
 
 class StateScreen(GridLayout):
-    uptime = ObjectProperty(None)
+    time=StringProperty(monitor.Uptime()())
+
 
 
 class MainScreen(GridLayout):

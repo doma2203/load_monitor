@@ -31,6 +31,7 @@
     cols:1
     spacing:[10,10]
     StateScreen:
+        id:StateScreen
         rows:1
         cols:4
         size_hint_y:None
@@ -53,10 +54,9 @@
             CurrStateSmall:
                 text:"[b]Uptime[/b]"
             StateDisplay:
-                id:"uptime"
                 padding:[15,5,0,0]
                 -height:"45px"
-                text:"12:45:32"
+                text:StateScreen.time
                 -font_size:"32pt"
         GridLayout:
             rows:3

@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/python
 
 # ps -eo comm,ppid,pid,sid,tty,state|grep "load_daemon*"
 
@@ -10,7 +10,8 @@ import monitor
 
 
 def main():
-    print monitor.Batteries()
+    print monitor.Batteries()()
+    print monitor.RAM()()
     pass
 
 if __name__ == '__main__':

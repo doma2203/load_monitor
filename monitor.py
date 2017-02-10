@@ -1,21 +1,25 @@
 #!/usr/bin/env python
+import os
+
+if os.getuid() is not 0:
+    raise ImportWarning('Aby uruchomic program wykorzystujacy modul monitor, potrzebujesz praw roota!')
 
 import psutil
 from glob import glob
-import os
 import os.path
 import re
 import time
 from pySMART import DeviceList
 
-'''Wersja obiektowa kodu jest skonstruowana tak, aby jak najmniej czesci wspolnych dla modulu sie powtarzalo,
+
+''' Wersja obiektowa kodu jest skonstruowana tak, aby jak najmniej czesci wspolnych dla modulu sie powtarzalo,
 zeby mozliwa byla specjalizacja jednego konkretnego elementu (klasy) w kontekscie wielu odczytow, poprzez dziedziczenie
-i funkcje wirtualne. Kazdy odczyt posiada te same metody, ale dla kazdego elementu realizowane sa inaczej, z uwagi na
-rozne pliki, z ktorych czytaja oraz inny sposob etykietowania i nazywania konkretnych odczytow. Kod z tego powodu moze
-wydawac sie troche dluzszy, ale jest sporo czytelniejszy (szczegolnie widac to na przykladzie temperatury). Wszystkie
-klasy poszczegolnych parametrow sa "callable" - zeby mozliwe bylo zwrocenie konkretnych wartosci, a te, ktore
-zorganizowane sa w bardziej zlozone typy danych - takze "iterable", zeby uzytkownik mogl sobie intuicyjnie iterowac
-po rdzeniach, procesach i obszarach monitorowania temperatury.'''
+i metody abstrakcyjne. Kazdy odczyt posiada te same metody, ale dla kazdego elementu realizowane sa inaczej, z uwagi
+na rozne pliki, z ktorych czytaja oraz inny sposob etykietowania i nazywania konkretnych odczytow. Kod z tego powodu
+moze wydawac sie troche dluzszy, ale jest sporo czytelniejszy (szczegolnie widac to na przykladzie temperatury).
+Wszystkie klasy poszczegolnych parametrow sa "callable" - zeby mozliwe bylo zwrocenie czytelnych i sensownych wartosci,
+a te, ktore zorganizowane sa w bardziej zlozone typy danych - takze "iterable", zeby uzytkownik mogl sobie intuicyjnie
+iterowac po rdzeniach, procesach i obszarach monitorowania temperatury. '''
 
 
 class MonitorPoint(object):
@@ -108,7 +112,7 @@ class TemperaturePoints:
         for i in iglob('/sys/class/hwmon/hwmon?'):
             for k in TemperaturePoints(i):
                 print k
-        Dla wiekszej przejrzystosci dodana funkcja Temperatures() (implementacja ponizej)'''
+        Dla wiekszej przejrzystosci dodano Temperatures() (implementacja ponizej)'''
         yield self.group
         for item in self.items:
             yield item
@@ -176,7 +180,7 @@ class Cores:
 class Processes:
     def __init__(self, number=5):
         self._number = number
-        self.pslist = self.processlist()
+        self._pslist = self.processlist()
 
     def __call__(self, *args, **kwargs):
         return self.pslist
@@ -196,7 +200,7 @@ class Processes:
     def processlist(self):
         '''Po wyjasnienia 'dlaczego tak nieczytelnie' zapraszam do dokumentacji psutil, czytelniej sie nie dalo.
         Lambda to handmade, sortowanie jest przeprowadzane poprawnie, nawet jesli nie uruchamiamy jej w petli
-        (od niej zalezy cpu_percent), bo sortuje wtedy wedlug zuzucia RAMunit-u, a potem przez przydzial pamieci :)
+        (od niej zalezy cpu_percent), bo sortuje wtedy wedlug zuzucia RAM-u, a potem przez przydzial pamieci :)
         Zwracamy liste (wazna kolejnosc!!!) skladajaca sie z nazwy i PID-u - umozliwia to szybkie reczne 'ubicie'
         procesu naduzywajacego naszej goscinnosci... '''
         proclist = list()
@@ -229,7 +233,7 @@ class RAMunit(MonitorPoint):
         if self.mode is 'total':
             return RAMunit.findsize(10, 5, 'MemTotal', info[0])
         elif self.mode is 'free':
-            # nie wiem, kto wymyslil taka ilosc spacji, wklepalam z autopsji :D
+            # nie wiem, kto wymyslil taka ilosc spacji, otrzymane po zmudnym liczeniu w terminalu :D
             return RAMunit.findsize(11, 4, 'MemFree', info[1])
         else:
             raise NotImplementedError
@@ -237,7 +241,7 @@ class RAMunit(MonitorPoint):
     @staticmethod
     def findsize(upperbound, lowerbound, parameter, text):
         for spacenum in range(upperbound, lowerbound, -1):
-            regexp = r'(?<=' + parameter + ':\s{' + str(spacenum) + '})(\d+)'
+            regexp = r'(?<=' + parameter + ':\s{' + str(spacenum) + '})(\d+)'  # "skladanie" regexpa :)
             try:
                 res = re.search(regexp, text)
                 return float(res.group(0)) / 1024
@@ -251,7 +255,7 @@ class RAM:
         self._free = RAMunit('free')
 
     def __call__(self, *args, **kwargs):
-        return self.available.__call__(), self.free.__call__()
+        return self.available(), self.free()
 
     @property
     def available(self):
@@ -268,7 +272,7 @@ class Battery(MonitorPoint):
         super(Battery, self).__init__()
 
     def __call__(self, *args, **kwargs):
-        return self.path, self.value
+        return self.label, self.value
 
     @property
     def path(self):
@@ -281,7 +285,7 @@ class Battery(MonitorPoint):
 
     def checklabel(self):
         if os.path.exists(self.path):
-            battlab = re.search('(?<=power_supply/)(\w{3}\d)', self.path)
+            battlab = re.search('(?<=power_supply/)(BAT\d)', self.path)
             return battlab.group(0)
 
 
@@ -314,6 +318,7 @@ def Temperatures():
 
 
 class HDD:
+    '''Znalazlam modul do odczytu S.M.A.R.T-a! :D'''
     def __init__(self):
         self._devices = [i for i in DeviceList().devices]
         self.gettemp = lambda k: int(str(k.attributes[194]).split()[-1])
